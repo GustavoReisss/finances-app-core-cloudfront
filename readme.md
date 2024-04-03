@@ -1,6 +1,6 @@
 # Finances-App Core Cloudfront
 
-This repository contains the IaC for Cloudfront, which is responsible for handling all incoming requests for both Frontend static files stored in an S3 Bucket and Backend API request handlers behind certain Lambda Function URLs
+This repository contains the IaC for Cloudfront, which is responsible for handling all incoming requests for both Frontend static files stored in an S3 Bucket and Backend API request handlers behind API Gateway
 
 ## Project Overview
 

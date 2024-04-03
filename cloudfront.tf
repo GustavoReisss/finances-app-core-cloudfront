@@ -41,54 +41,92 @@ resource "aws_cloudfront_distribution" "distribution" {
 
 
   # Lambda URL Origins
-  dynamic "origin" {
-    for_each = var.lambda_origin_configs
+  # dynamic "origin" {
+  #   for_each = var.lambda_origin_configs
 
-    content {
-      domain_name = origin.value["domain_url"]
-      origin_id = origin.value["lambda_name"]
+  #   content {
+  #     domain_name = origin.value["domain_url"]
+  #     origin_id = origin.value["lambda_name"]
 
-      custom_origin_config {
-        https_port = 443
-        http_port = 80
-        origin_protocol_policy = "https-only"
-        origin_ssl_protocols = ["TLSv1.2"]
-      }
-    }
-  }
+  #     custom_origin_config {
+  #       https_port = 443
+  #       http_port = 80
+  #       origin_protocol_policy = "https-only"
+  #       origin_ssl_protocols = ["TLSv1.2"]
+  #     }
+  #   }
+  # }
 
 
   # Lambda URL Behaviors
-  dynamic "ordered_cache_behavior" {
-    for_each = var.lambda_origin_configs
+  # dynamic "ordered_cache_behavior" {
+  #   for_each = var.lambda_origin_configs
 
-    content {
-      path_pattern = "/api/${ordered_cache_behavior.value["api_path"]}/*"
+  #   content {
+  #     path_pattern = "/api/${ordered_cache_behavior.value["api_path"]}/*"
       
-      allowed_methods  = ["HEAD", "DELETE", "POST", "GET", "OPTIONS", "PUT", "PATCH"]
-      cached_methods = ["HEAD", "GET", "OPTIONS"]
-      target_origin_id = ordered_cache_behavior.value["lambda_name"]
+  #     allowed_methods  = ["HEAD", "DELETE", "POST", "GET", "OPTIONS", "PUT", "PATCH"]
+  #     cached_methods = ["HEAD", "GET", "OPTIONS"]
+  #     target_origin_id = ordered_cache_behavior.value["lambda_name"]
 
-      forwarded_values {
-        query_string = true
+  #     forwarded_values {
+  #       query_string = true
 
-        cookies {
-          forward = "whitelist"
-          whitelisted_names = [
-            "sessionId"
-          ]
-        }
-      }
+  #       cookies {
+  #         forward = "whitelist"
+  #         whitelisted_names = [
+  #           "sessionId"
+  #         ]
+  #       }
+  #     }
 
-      viewer_protocol_policy = "redirect-to-https"
+  #     viewer_protocol_policy = "redirect-to-https"
 
-      #disabled cache
-      min_ttl                = 0
-      default_ttl            = 0
-      max_ttl                = 0
+  #     #disabled cache
+  #     min_ttl                = 0
+  #     default_ttl            = 0
+  #     max_ttl                = 0
+  #   }
+  # }
+
+  origin {
+    domain_name = "${var.api_gateway_id}.execute-api.${var.api_gateway_region}.amazonaws.com"
+    origin_id = "api-gateway-${var.api_gateway_id}"
+    # origin_path = "/dev"
+
+    custom_origin_config {
+      https_port = 443
+      http_port = 80
+      origin_protocol_policy = "https-only"
+      origin_ssl_protocols = ["TLSv1.2"]
     }
   }
 
+  ordered_cache_behavior {
+    path_pattern = "/api/*"
+    
+    allowed_methods  = ["HEAD", "DELETE", "POST", "GET", "OPTIONS", "PUT", "PATCH"]
+    cached_methods = ["HEAD", "GET", "OPTIONS"]
+    target_origin_id = "api-gateway-${var.api_gateway_id}"
+
+    forwarded_values {
+      query_string = false
+
+      cookies {
+        forward = "whitelist"
+        whitelisted_names = [
+          "sessionId"
+        ]
+      }
+    }
+
+    viewer_protocol_policy = "allow-all"
+
+    #disabled cache
+    min_ttl                = 0
+    default_ttl            = 0
+    max_ttl                = 0
+  }
   
   custom_error_response {
     error_code = 403
