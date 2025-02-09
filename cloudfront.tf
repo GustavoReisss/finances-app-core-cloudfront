@@ -110,7 +110,7 @@ resource "aws_cloudfront_distribution" "distribution" {
     target_origin_id = "api-gateway-${var.api_gateway_id}"
 
     forwarded_values {
-      query_string = false
+      query_string = true
 
       cookies {
         forward = "whitelist"

@@ -4,7 +4,7 @@
 frontend_bucket_name = "finances-app-frontend-bucket"
 frontend_bucket_name_origin_path = "/finances-app/browser"
 
-api_gateway_id = "43bm9vnw7g"
+api_gateway_id = "my48cf3ohg"
 
 # lambda_origin_configs = [
 #     {
